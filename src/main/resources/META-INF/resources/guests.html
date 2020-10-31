@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Guest REST service</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/wingcss/0.1.8/wing.min.css"/>
+    <!-- Load AngularJS -->
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <script type="text/javascript">
+        var app = angular.module("GuestManagement", []);
+
+        //Controller Part
+        app.controller("GuestManagementController", function ($scope, $http) {
+
+            //Initialize page with default data which is blank in this example
+            $scope.guests = [];
+
+            $scope.form = {
+                name: "",
+                phone: "",
+                id: "-1"
+            };
+
+            //Now load the data from server
+            _refreshPageData();
+
+            //HTTP POST methods for add guests
+            $scope.add = function () {
+                var data = {"name": $scope.form.name, "phone": $scope.form.phone, "id": $scope.form.id};
+
+                $http({
+                    method: "POST",
+                    url: '/api/guests',
+                    data: angular.toJson(data),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(_success, _error);
+            };
+
+            /* Private Methods */
+
+            //HTTP GET- get all guests collection
+            function _refreshPageData() {
+                $http({
+                    method: 'GET',
+                    url: '/api/guests'
+                }).then(function successCallback(response) {
+                    $scope.guests = response.data;
+                }, function errorCallback(response) {
+                    console.log(response.statusText);
+                });
+            }
+
+            function _success(response) {
+                _refreshPageData();
+                _clearForm();
+            }
+
+            function _error(response) {
+                alert(response.data.message || response.statusText);
+            }
+
+            //Clear the form
+            function _clearForm() {
+                $scope.form.name = "";
+                $scope.form.phone = "";
+                $scope.form.id = "-1";
+            }
+        });
+    </script>
+</head>
+<body ng-app="GuestManagement" ng-controller="GuestManagementController">
+
+<div class="container">
+    <h1>REST Service - Guest</h1>
+
+    <h3>Add a Guest</h3>
+    <form ng-submit="add()">
+        <div class="row">
+            <div class="col-6"><input type="text" placeholder="Name" ng-model="form.name" size="60"/></div>
+        </div>
+        <div class="row">
+            <div class="col-6"><input type="text" placeholder="Phone" ng-model="form.phone" size="60"/></div>
+        </div>
+        <input type="submit" value="Save"/>
+    </form>
+
+    <h3>Guest List</h3>
+    <div class="row">
+        <div class="col-1">Id</div>
+        <div class="col-2">Name</div>
+        <div class="col-3">Phone</div>
+    </div>
+    <div class="row" ng-repeat="guest in guests">
+        <div class="col-1">{{ guest.id }}</div>
+        <div class="col-2">{{ guest.name }}</div>
+        <div class="col-3">{{ guest.phone }}</div>
+    </div>
+</div>
+
+</body>
+</html>
