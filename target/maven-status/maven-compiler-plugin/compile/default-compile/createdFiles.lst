@@ -1,3 +1,5 @@
 org/acme/resteasy/ExampleResource.class
 name/legkodymov/hotel/GuestResource.class
+name/legkodymov/hotel/FruitResource.class
+name/legkodymov/hotel/model/Fruit.class
 name/legkodymov/hotel/model/Guest.class
